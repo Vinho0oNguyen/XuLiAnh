@@ -58,25 +58,24 @@ def main(thuMuc):
 
         if len(licPlate.strChars) == 0:                     # if no chars were found in the plate
             print("\nno characters were detected\n\n")  # show message
-            return                                          # and exit program
+            return                                       # and exit program
         # end if
 
-        drawRedRectangleAroundPlate(imgOriginalScene, licPlate)             # draw red rectangle around plate
+        # drawRedRectangleAroundPlate(imgOriginalScene, licPlate)             # draw red rectangle around plate
 
         # print("\nlicense plate read from image = " + licPlate.strChars + "\n")  # write license plate text to std out
         # print("----------------------------------------")
 
-        writeLicensePlateCharsOnImage(imgOriginalScene, licPlate)           # write license plate text on the image
+        # writeLicensePlateCharsOnImage(imgOriginalScene, licPlate)           # write license plate text on the image
 
         # cv2.imshow("imgOriginalScene", imgOriginalScene)                # re-show scene image
 
         # cv2.imwrite("imgOriginalScene.png", imgOriginalScene)           # write image out to file
-
+        return licPlate.strChars
     # end if else
 
     cv2.waitKey(0)					# hold windows open until user presses a key
 
-    return licPlate.strChars
 # end main
 
 ###################################################################################################
@@ -156,12 +155,26 @@ def videos():
             #In cac bien so chup duoc
             print("plate: ", listtmp)
         if(cv2.waitKey(1) & 0xFF == ord('e')):
-            return listtmp
+            break
             
 ###################################################################################################
 ###################################################################################################
 if __name__ == "__main__":
-    print("List Plate is: ", videos())
+    while True:
+        print("==================MENU==================")
+        print("1. Nhan dien bang camera")
+        print("2. Nhan dien bang file anh")
+        print("0. Thoat")
+        print("Nhap lua chon: ")
+        nhapLuaChon = int(input())
+        if (nhapLuaChon == 1):
+            videos()
+        elif (nhapLuaChon == 2):
+            bienSo = main("32.png")
+            print("Plate = ", bienSo)
+        elif (nhapLuaChon == 0): break
+        
+    
 
 
 

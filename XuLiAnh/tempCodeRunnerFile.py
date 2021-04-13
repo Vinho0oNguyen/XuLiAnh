@@ -1,2 +1,10 @@
-print("\nlicense plate read from image = " + licPlate.strChars + "\n")  # write license plate text to std out
-        # print("----------------------------------------")
+while True:
+    #     print("==================MENU==================")
+    #     print("1. Nhan dien bang camera")
+    #     print("2. Nhan dien bang file anh")
+    #     print("0. Thoat")
+    #     print("Nhap lua chon: ")
+    #     nhapLuaChon = int(input())
+    #     if (nhapLuaChon == 1):
+    #         videos()
+    #     elif (nhapLuaChon == 2):
