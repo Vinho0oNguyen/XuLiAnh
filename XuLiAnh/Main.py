@@ -8,6 +8,10 @@ import DetectChars
 import DetectPlates
 import PossiblePlate
 
+from tkinter import *
+from PIL import ImageTk, Image
+from tkinter import filedialog
+
 # module level variables ##########################################################################
 SCALAR_BLACK = (0.0, 0.0, 0.0)
 SCALAR_WHITE = (255.0, 255.0, 255.0)
@@ -20,6 +24,69 @@ showSteps = False
 
 def main(thuMuc):
    
+
+    blnKNNTrainingSuccessful = DetectChars.loadKNNDataAndTrainKNN()         # attempt KNN training
+
+    if blnKNNTrainingSuccessful == False:                               # if KNN training was not successful
+        print("\nerror: KNN traning was not successful\n")  # show error message
+        return                                                          # and exit program
+    # end if
+
+    imgOriginalScene  = cv2.imread(thuMuc)               # open image
+
+    if imgOriginalScene is None:                            # if image was not read successfully
+        print("\nerror: image not read from file \n\n")  # print error message to std out
+        os.system("pause")                                  # pause so user can see error message
+        return                                              # and exit program
+    # end if
+
+    listOfPossiblePlates = DetectPlates.detectPlatesInScene(imgOriginalScene)           # detect plates
+
+    listOfPossiblePlates = DetectChars.detectCharsInPlates(listOfPossiblePlates)        # detect chars in plates
+    
+    cv2.imshow("imgOriginalScene", imgOriginalScene)            # show scene image
+
+    if len(listOfPossiblePlates) == 0:                          # if no plates were found
+        print("\nno license plates were detected\n")  # inform user no plates were found
+    else:                                                       # else
+                # if we get in here list of possible plates has at leat one plate
+
+                # sort the list of possible plates in DESCENDING order (most number of chars to least number of chars)
+        listOfPossiblePlates.sort(key = lambda possiblePlate: len(possiblePlate.strChars), reverse = True)
+
+                # suppose the plate with the most recognized chars (the first plate in sorted by string length descending order) is the actual plate
+        licPlate = listOfPossiblePlates[0]
+
+        cv2.imshow("imgPlate", licPlate.imgPlate)           # show crop of plate and threshold of plate
+        cv2.imshow("imgThresh", licPlate.imgThresh)
+
+        if len(licPlate.strChars) == 0:                     # if no chars were found in the plate
+            print("\nno characters were detected\n\n")  # show message
+            return                                       # and exit program
+        # end if
+
+        # drawRedRectangleAroundPlate(imgOriginalScene, licPlate)             # draw red rectangle around plate
+
+        # print("\nlicense plate read from image = " + licPlate.strChars + "\n")  # write license plate text to std out
+        # print("----------------------------------------")
+
+        # writeLicensePlateCharsOnImage(imgOriginalScene, licPlate)           # write license plate text on the image
+
+        cv2.imshow("imgOriginalScene", imgOriginalScene)                # re-show scene image
+
+        # cv2.imwrite("imgOriginalScene.png", imgOriginalScene)           # write image out to file
+        cv2.waitKey(0)
+        return licPlate.strChars
+    # end if else
+
+    					# hold windows open until user presses a key
+
+# end main
+
+
+
+def mainVideos(thuMuc):
+       
 
     blnKNNTrainingSuccessful = DetectChars.loadKNNDataAndTrainKNN()         # attempt KNN training
 
@@ -71,10 +138,11 @@ def main(thuMuc):
         # cv2.imshow("imgOriginalScene", imgOriginalScene)                # re-show scene image
 
         # cv2.imwrite("imgOriginalScene.png", imgOriginalScene)           # write image out to file
+        
         return licPlate.strChars
     # end if else
 
-    cv2.waitKey(0)					# hold windows open until user presses a key
+    					# hold windows open until user presses a key
 
 # end main
 
@@ -145,7 +213,7 @@ def videos():
         cv2.imshow("Video", img)
         if(cv2.waitKey(1) & 0xFF == ord('q')):
             cv2.imwrite("LicPlateImages/100.png", img)
-            bienSo = main("LicPlateImages/100.png") # lay bien so xe
+            bienSo = mainVideos("LicPlateImages/100.png") # lay bien so xe
             
             #Kiem tra bien so ton tai
             check = bienSo in listtmp
@@ -170,7 +238,13 @@ if __name__ == "__main__":
         if (nhapLuaChon == 1):
             videos()
         elif (nhapLuaChon == 2):
-            bienSo = main("32.png")
+            win = Tk()
+            win.title("Convert img to text from file")
+
+            fileName = filedialog.askopenfile(initialdir = "/gui.image", title = "Select A File", filetypes = (("png file", "*.png"), ("jpg file", "*.jpg"), ("all file", "*.")))
+            
+            bienSo = main(fileName.name)
+            win.destroy()
             print("Plate = ", bienSo)
         elif (nhapLuaChon == 0): break
         
